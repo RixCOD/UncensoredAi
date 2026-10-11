@@ -1,0 +1,74 @@
+
+=== search (search.py) starting ===
+[search] indeed: 'Software Developer' in 'Japan'
+[search] indeed: 'Software Developer' in 'USA'
+[search] indeed: 'Software Developer' in 'Switzerland'
+[search] indeed: 'Web Developer' in 'Japan'
+[search] indeed: 'Web Developer' in 'USA'
+[search] indeed: 'Web Developer' in 'Switzerland'
+[search] indeed: 'Game Developer' in 'Japan'
+[search] indeed: 'Game Developer' in 'USA'
+[search] indeed: 'Game Developer' in 'Switzerland'
+[search] linkedin: 'Software Developer' in 'Japan'
+[search] linkedin: 'Software Developer' in 'USA'
+[search] linkedin: 'Software Developer' in 'Switzerland'
+[search] linkedin: 'Web Developer' in 'Japan'
+[search] linkedin: 'Web Developer' in 'USA'
+[search] linkedin: 'Web Developer' in 'Switzerland'
+[search] linkedin: 'Game Developer' in 'Japan'
+[search] linkedin: 'Game Developer' in 'USA'
+[search] linkedin: 'Game Developer' in 'Switzerland'
+[search] Done. 270 new listings added, 270 total in apply.json.
+=== search finished (ok=True) ===
+
+=== fillform (fillform.py) starting ===
+Traceback (most recent call last):
+  File "D:\project\UncensoredAi\fillform.py", line 181, in <module>
+    run_fillform()
+  File "D:\project\UncensoredAi\fillform.py", line 167, in run_fillform
+    status = apply_to_job(page, job, cv)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\UncensoredAi\fillform.py", line 104, in apply_to_job
+    print(f"[fillform] Opening {job.get('company')} - {job.get('role')}")
+  File "C:\Users\anshu\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 19-29: character maps to <undefined>
+=== fillform finished (ok=False) ===
+
+=== search (search.py) starting ===
+[search] indeed: 'Software Developer' in 'Japan'
+[search] indeed: 'Software Developer' in 'USA'
+[search] indeed: 'Software Developer' in 'Switzerland'
+[search] indeed: 'Web Developer' in 'Japan'
+[search] indeed: 'Web Developer' in 'USA'
+[search] indeed: 'Web Developer' in 'Switzerland'
+[search] indeed: 'Game Developer' in 'Japan'
+[search] indeed: 'Game Developer' in 'USA'
+[search] indeed: 'Game Developer' in 'Switzerland'
+[search] linkedin: 'Software Developer' in 'Japan'
+[search] linkedin: 'Software Developer' in 'USA'
+[search] linkedin: 'Software Developer' in 'Switzerland'
+[search] linkedin: 'Web Developer' in 'Japan'
+[search] linkedin: 'Web Developer' in 'USA'
+[search] linkedin: 'Web Developer' in 'Switzerland'
+[search] linkedin: 'Game Developer' in 'Japan'
+[search] linkedin: 'Game Developer' in 'USA'
+[search] linkedin: 'Game Developer' in 'Switzerland'
+[search] Done. 270 new listings added, 540 total in apply.json.
+=== search finished (ok=True) ===
+
+=== fillform (fillform.py) starting ===
+Traceback (most recent call last):
+  File "D:\project\UncensoredAi\fillform.py", line 181, in <module>
+    run_fillform()
+  File "D:\project\UncensoredAi\fillform.py", line 167, in run_fillform
+    status = apply_to_job(page, job, cv)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\project\UncensoredAi\fillform.py", line 104, in apply_to_job
+    print(f"[fillform] Opening {job.get('company')} - {job.get('role')}")
+  File "C:\Users\anshu\AppData\Local\Programs\Python\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 19-29: character maps to <undefined>
+=== fillform finished (ok=False) ===

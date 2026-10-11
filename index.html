@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Job Auto Apply Dashboard</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --border: #2a2e37;
+    --text: #e6e8eb;
+    --muted: #8b909c;
+    --accent: #4f8cff;
+    --green: #3fbf6f;
+    --amber: #e0a83e;
+    --red: #e05a5a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px;
+  }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  p.subtitle { color: var(--muted); margin-top: 0; margin-bottom: 28px; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .stat-card .value { font-size: 28px; font-weight: 600; }
+  .stat-card .label { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  .progress-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 32px;
+  }
+  .progress-bar-bg {
+    background: var(--border);
+    border-radius: 6px;
+    height: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+  .progress-bar-fill {
+    background: var(--accent);
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  th, td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  th { color: var(--muted); font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .badge.submitted { background: rgba(63,191,111,0.15); color: var(--green); }
+  .badge.pending { background: rgba(224,168,62,0.15); color: var(--amber); }
+  .badge.failed { background: rgba(224,90,90,0.15); color: var(--red); }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .empty { color: var(--muted); padding: 24px; text-align: center; }
+</style>
+</head>
+<body>
+  <h1>Job Auto Apply Dashboard</h1>
+  <p class="subtitle">Tracking scraped listings and application progress.</p>
+
+  <div class="progress-wrap" id="pipeline-banner" style="display:none; margin-bottom:16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span id="pipeline-status-text">Pipeline idle</span>
+      <button id="run-pipeline-btn" style="background:var(--accent); color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:13px;">Run Pipeline</button>
+    </div>
+  </div>
+
+  <div class="stats-grid" id="stats-grid"></div>
+
+  <div class="progress-wrap">
+    <div style="display:flex; justify-content:space-between;">
+      <span>Progress</span>
+      <span id="progress-label" style="color: var(--muted); font-size: 13px;"></span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-bar-fill"></div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Company</th>
+        <th>Role</th>
+        <th>Location</th>
+        <th>Salary</th>
+        <th>Status</th>
+        <th>Link</th>
+      </tr>
+    </thead>
+    <tbody id="applied-body">
+      <tr><td colspan="6" class="empty">Loading...</td></tr>
+    </tbody>
+  </table>
+
+<script>
+async function loadStats() {
+  const res = await fetch('/api/stats');
+  const s = await res.json();
+
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = `
+    <div class="stat-card"><div class="value">${s.total_found}</div><div class="label">Jobs Found</div></div>
+    <div class="stat-card"><div class="value">${s.total_processed}</div><div class="label">Processed</div></div>
+    <div class="stat-card"><div class="value">${s.submitted}</div><div class="label">Submitted</div></div>
+    <div class="stat-card"><div class="value">${s.pending_review}</div><div class="label">Pending Review</div></div>
+    <div class="stat-card"><div class="value">${s.failed}</div><div class="label">Failed</div></div>
+  `;
+
+  const pct = s.total_found > 0 ? Math.round((s.total_processed / s.total_found) * 100) : 0;
+  document.getElementById('progress-bar-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${s.total_processed} / ${s.total_found} (${pct}%)`;
+}
+
+function statusBadge(status) {
+  const map = {
+    submitted: ['submitted', 'Submitted'],
+    filled_pending_review: ['pending', 'Pending Review'],
+    failed: ['failed', 'Failed'],
+  };
+  const [cls, label] = map[status] || ['pending', status || 'Unknown'];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+async function loadApplied() {
+  const res = await fetch('/api/applied');
+  const jobs = await res.json();
+  const body = document.getElementById('applied-body');
+
+  if (!jobs.length) {
+    body.innerHTML = '<tr><td colspan="6" class="empty">No applications yet. Run fillform.py to get started.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = jobs.map(j => `
+    <tr>
+      <td>${j.company ?? ''}</td>
+      <td>${j.role ?? ''}</td>
+      <td>${j.address ?? j.country ?? ''}</td>
+      <td>${j.salary ?? ''}</td>
+      <td>${statusBadge(j.status)}</td>
+      <td><a href="${j.apply_link}" target="_blank" rel="noopener">View</a></td>
+    </tr>
+  `).join('');
+}
+
+async function loadPipelineStatus() {
+  const res = await fetch('/api/pipeline-status');
+  const p = await res.json();
+  const banner = document.getElementById('pipeline-banner');
+  const text = document.getElementById('pipeline-status-text');
+
+  banner.style.display = 'block';
+
+  if (p.running) {
+    const stepLabel = {
+      cv2json: 'Parsing CV...',
+      search: 'Searching for jobs...',
+      fillform: 'Filling & applying to jobs...',
+    }[p.current_step] || 'Running...';
+    text.textContent = `⏳ ${stepLabel}`;
+  } else if (p.error) {
+    text.textContent = `⚠️ Pipeline error: ${p.error}`;
+  } else if (p.steps_done && p.steps_done.length) {
+    text.textContent = `✅ Pipeline finished.`;
+  } else {
+    text.textContent = 'Pipeline idle';
+  }
+}
+
+async function runPipeline() {
+  const btn = document.getElementById('run-pipeline-btn');
+  btn.disabled = true;
+  try {
+    await fetch('/api/run-pipeline', { method: 'POST' });
+  } finally {
+    setTimeout(() => { btn.disabled = false; }, 2000);
+  }
+}
+
+document.getElementById('run-pipeline-btn').addEventListener('click', runPipeline);
+
+async function refresh() {
+  await Promise.all([loadStats(), loadApplied(), loadPipelineStatus()]);
+}
+
+refresh();
+setInterval(refresh, 5000); // auto-refresh every 5s
+</script>
+</body>
+</html>
